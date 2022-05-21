@@ -1,24 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState,useEffect} from "react";
+import { Routes, Route } from "react-router-dom";
+import NoteTemplate from "./components/NoteTemplate";
+import PostList from "./components/PostList";
 
 function App() {
+  const [inputText, setInputText] = useState({
+    title: "",
+    content: "",
+  });
+  const [postList, setPostList] = useState([]);
+  const time = new Date();
+  const handleChangeText = (e) => {
+    const { value, name } = e.target;
+    setInputText((inputText) => ({
+      ...inputText,
+      [name]: value,
+    }));
+  };
+  const handleSubmitPost = (e) => {
+    e.preventDefault();
+    setPostList((postList) => [
+      ...postList,
+      {
+        title: inputText.title,
+        content: inputText.content,
+        time: time.toLocaleDateString(),
+      },
+    ]);
+
+    setInputText({
+      title: "",
+      content: "",
+    });
+  };
+  localStorage.setItem("posting", JSON.stringify(postList));
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <NoteTemplate
+            inputText={inputText}
+            handleChangeText={handleChangeText}
+            handleSubmitPost={handleSubmitPost}
+          />
+        }
+      />
+      <Route path="/postlist" element={<PostList postList={postList} />} />
+    </Routes>
   );
 }
 
